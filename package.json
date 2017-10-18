@@ -1,0 +1,61 @@
+{
+  "name": "graphql-field-resolver-to-typescript",
+  "version": "0.0.1",
+  "description": "Export ts definitions from your server .graphql files to strictly type your field resolvers",
+  "repository": "https://github.com/stipsan/release-relief.git",
+  "bin": {
+    "graphql-typewriter": "bin/graphql-typewriter.js"
+  },
+  "author": "Stian Didriksen <stipsan@gmail.com>",
+  "main": "src/index.js",
+  "license": "MIT",
+  "scripts": {
+    "compile": "tsc --noUnusedLocals",
+    "lint": "tslint -e '**/*.d.ts' -e 'node_modules/**' '**/*.ts'",
+    "pretest": "npm run compile",
+    "test": "mocha && npm run lint && node ./bin/graphql-typewriter.js",
+    "precoverage": "npm run compile",
+    "coverage": "istanbul cover --print none --report none ./node_modules/.bin/_mocha && remap-istanbul -i ./coverage/coverage.json -o ./coverage/coverage-remapped.json && istanbul report --include ./coverage/coverage-remapped.json",
+    "postcoverage": "istanbul check-coverage coverage/coverage-remapped.json --statements 100",
+    "thought": "thought run -a",
+    "version": "thoughtful changelog -o -a && npm run thought",
+    "prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "commander": "^2.11.0",
+    "glob": "^7.1.2",
+    "graphql": "^0.10.5",
+    "graphql-subscriptions": "^0.4.4",
+    "graphql-tools": "^1.1.0",
+    "m-io": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.2",
+    "@types/commander": "^2.9.1",
+    "@types/glob": "^5.0.30",
+    "@types/graphql": "^0.10.2",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^8.0.19",
+    "chai": "^4.1.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.5.0",
+    "remap-istanbul": "^0.9.5",
+    "thought": "^1.5.1",
+    "thoughtful-release": "^0.3.1",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.5.0",
+    "tslint-config-standard": "^6.0.1",
+    "tslint-eslint-rules": "^4.1.1",
+    "typescript": "^2.4.2"
+  },
+  "files": [
+    "src",
+    "bin"
+  ],
+  "keywords": [
+    "typescript",
+    "graphql",
+    "interfaces",
+    "server"
+  ]
+}
