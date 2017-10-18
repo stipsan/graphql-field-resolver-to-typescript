@@ -1,4 +1,3 @@
 # graphql-field-resolver-to-typescript &middot; [![CircleCI Status](https://img.shields.io/circleci/project/github/stipsan/graphql-field-resolver-to-typescript.svg?style=flat-square&label=circleci)](https://circleci.com/gh/stipsan/graphql-field-resolver-to-typescript)  [![npm](https://img.shields.io/npm/dm/graphql-field-resolver-to-typescript.svg?style=flat-square)](https://npm-stat.com/charts.html?package=graphql-field-resolver-to-typescript) [![npm version](https://img.shields.io/npm/v/graphql-field-resolver-to-typescript.svg?style=flat-square)](https://www.npmjs.com/package/graphql-field-resolver-to-typescript)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
 
 ## This readme will be updated in time for `v1.0.0`
