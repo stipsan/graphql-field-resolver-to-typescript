@@ -46,6 +46,17 @@
   "engines": {
     "node": ">=8"
   },
+  "jest": {
+    "transform": {
+      "^.+\\.ts$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.ts$",
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ]
+  },
   "lint-staged": {
     "*.ts": [
       "tslint --fix",
