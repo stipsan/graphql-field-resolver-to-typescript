@@ -4,7 +4,6 @@
   "author": "Stian Didriksen <stipsan@gmail.com>",
   "license": "MIT",
   "repository": "https://github.com/stipsan/graphql-field-resolver-to-typescript.git",
-  "version": "0.0.0",
   "main": "dist/index.js",
   "bin": {
     "gqlfr2ts": "dist/bin.js"
@@ -26,11 +25,8 @@
     "m-io": "^0.5.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.0.4",
     "@types/commander": "^2.9.1",
-    "@types/glob": "^5.0.33",
     "@types/graphql": "^0.11.5",
-    "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.45",
     "husky": "^0.14.3",
     "lint-staged": "^4.3.0",
