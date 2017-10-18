@@ -6,7 +6,7 @@
   "repository": "https://github.com/stipsan/release-relief.git",
   "main": "dist/index.js",
   "bin": {
-    "graphql-typewriter": "bin/graphql-typewriter.js"
+    "graphql-typewriter": "dist/bin/graphql-typewriter.js"
   },
   "scripts": {
     "changelog:commit": "sr-changelog commit",
@@ -25,8 +25,11 @@
     "m-io": "^0.5.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.0.4",
     "@types/commander": "^2.9.1",
+    "@types/glob": "^5.0.33",
     "@types/graphql": "^0.11.5",
+    "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.45",
     "husky": "^0.14.3",
     "lint-staged": "^4.3.0",
