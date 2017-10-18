@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Setup semantic-release using [release-relief](https://github.com/stipsan/release-relief)
 
 ## 0.0.1 - 2017-10-18
 ### Added

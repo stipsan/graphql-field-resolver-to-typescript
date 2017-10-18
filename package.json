@@ -39,6 +39,7 @@
     "chai": "^4.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.5.0",
+    "release-relief": "^1.0.1",
     "remap-istanbul": "^0.9.5",
     "thought": "^1.5.1",
     "thoughtful-release": "^0.3.1",
