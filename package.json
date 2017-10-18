@@ -3,7 +3,7 @@
   "description": "Export ts definitions from your server .graphql files to strictly type your field resolvers",
   "author": "Stian Didriksen <stipsan@gmail.com>",
   "license": "MIT",
-  "repository": "https://github.com/stipsan/release-relief.git",
+  "repository": "https://github.com/stipsan/graphql-field-resolver-to-typescript.git",
   "main": "dist/index.js",
   "bin": {
     "graphql-typewriter": "dist/bin/graphql-typewriter.js"
