@@ -5,8 +5,8 @@ const mfs = require('m-io/fs')
 
 export interface CliArgs {
   /**
-     * An array of exclude paths
-     */
+   * An array of exclude paths
+   */
   exclude: string[]
   input: string[]
   dontSaveSameFile: boolean
