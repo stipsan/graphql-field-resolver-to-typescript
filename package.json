@@ -4,7 +4,6 @@
   "author": "Stian Didriksen <stipsan@gmail.com>",
   "license": "MIT",
   "repository": "https://github.com/stipsan/release-relief.git",
-  "version": "0.0.1",
   "main": "dist/index.js",
   "bin": {
     "graphql-typewriter": "bin/graphql-typewriter.js"
