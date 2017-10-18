@@ -13,7 +13,7 @@
 import path = require('path')
 import fs = require('fs')
 import { expect } from 'chai'
-import { buildSchema, graphql } from 'graphql'
+import { buildSchema, graphql, GraphQLSchema } from 'graphql'
 import { makeExecutableSchema } from 'graphql-tools'
 import { schema as simpleSchema } from './schemas/simpleSchema'
 import { schema as argumentSchema } from './schemas/arguments'
@@ -138,7 +138,7 @@ describe('The union schema (with graphql-tools)', async function() {
   const schema = makeExecutableSchema({
     typeDefs: read(fixture('union.graphqls')),
     resolvers: unionSchema.defaultResolvers,
-  })
+  }) as GraphQLSchema
   const root = new class Query implements unionSchema.Query<{}> {
     single() {
       return {
@@ -242,7 +242,7 @@ describe('The interface schema (with graphql-tools)', async function() {
   const schema = makeExecutableSchema({
     typeDefs: read(fixture('interface.graphqls')),
     resolvers: interfaceSchema.defaultResolvers,
-  })
+  }) as GraphQLSchema
   const root = new class Query implements interfaceSchema.Query<{}> {
     characters() {
       return [

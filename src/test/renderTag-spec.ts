@@ -1,4 +1,4 @@
-import { source, OMIT_NEXT_NEWLINE } from '../src/renderTag'
+import { source, OMIT_NEXT_NEWLINE } from '../renderTag'
 import { expect } from 'chai'
 
 describe('The renderTag function', function() {
