@@ -1,37 +1,29 @@
 {
   "name": "graphql-field-resolver-to-typescript",
-  "version": "0.0.1",
   "description": "Export ts definitions from your server .graphql files to strictly type your field resolvers",
+  "author": "Stian Didriksen <stipsan@gmail.com>",
+  "license": "MIT",
   "repository": "https://github.com/stipsan/release-relief.git",
+  "version": "0.0.1",
+  "main": "dist/index.js",
   "bin": {
     "graphql-typewriter": "bin/graphql-typewriter.js"
   },
-  "engines": {
-    "node": ">=8"
-  },
-  "author": "Stian Didriksen <stipsan@gmail.com>",
-  "main": "dist/index.js",
-  "license": "MIT",
   "scripts": {
+    "changelog:commit": "sr-changelog commit",
+    "changelog:preview": "sr-changelog",
+    "precommit": "lint-staged",
     "compile": "tsc --noUnusedLocals",
-    "lint": "tslint -e '**/*.d.ts' -e 'node_modules/**' '**/*.ts'",
-    "pretest": "npm run compile",
-    "test": "mocha && npm run lint && node ./bin/graphql-typewriter.js",
     "precoverage": "npm run compile",
     "coverage": "istanbul cover --print none --report none ./node_modules/.bin/_mocha && remap-istanbul -i ./coverage/coverage.json -o ./coverage/coverage-remapped.json && istanbul report --include ./coverage/coverage-remapped.json",
     "postcoverage": "istanbul check-coverage coverage/coverage-remapped.json --statements 100",
-    "thought": "thought run -a",
-    "version": "thoughtful changelog -o -a && npm run thought",
+    "lint": "tslint -e '**/*.d.ts' -e 'node_modules/**' '**/*.ts'",
     "prepublish": "npm run compile",
-    "changelog:preview": "sr-changelog",
-    "changelog:commit": "sr-changelog commit",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
-  },
-  "release": {
-    "analyzeCommits": "semantic-release-tamia/analyzeCommits",
-    "verifyConditions": "condition-circle",
-    "generateNotes": "semantic-release-tamia/generateNotes",
-    "verifyRelease": "semantic-release-tamia/verifyRelease"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "pretest": "npm run compile",
+    "test": "mocha && npm run lint && node ./bin/graphql-typewriter.js",
+    "thought": "thought run -a",
+    "version": "thoughtful changelog -o -a && npm run thought"
   },
   "dependencies": {
     "commander": "^2.11.0",
@@ -54,9 +46,37 @@
     "typescript": "^2.5.3"
   },
   "keywords": [
-    "typescript",
     "graphql",
     "interfaces",
-    "server"
-  ]
+    "server",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "tslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.graphql": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.json": [
+      "prettier --write",
+      "git add"
+    ],
+    "package.json": [
+      "prettier-package-json --write",
+      "git add"
+    ]
+  },
+  "release": {
+    "analyzeCommits": "semantic-release-tamia/analyzeCommits",
+    "verifyConditions": "condition-circle",
+    "generateNotes": "semantic-release-tamia/generateNotes",
+    "verifyRelease": "semantic-release-tamia/verifyRelease"
+  }
 }
