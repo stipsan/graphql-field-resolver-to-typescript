@@ -12,17 +12,9 @@
     "changelog:commit": "sr-changelog commit",
     "changelog:preview": "sr-changelog",
     "precommit": "lint-staged",
-    "compile": "tsc --noUnusedLocals",
-    "precoverage": "npm run compile",
-    "coverage": "istanbul cover --print none --report none ./node_modules/.bin/_mocha && remap-istanbul -i ./coverage/coverage.json -o ./coverage/coverage-remapped.json && istanbul report --include ./coverage/coverage-remapped.json",
-    "postcoverage": "istanbul check-coverage coverage/coverage-remapped.json --statements 100",
-    "lint": "tslint -e '**/*.d.ts' -e 'node_modules/**' '**/*.ts'",
-    "prepublish": "npm run compile",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "pretest": "npm run compile",
-    "test": "mocha && npm run lint && node ./bin/graphql-typewriter.js",
-    "thought": "thought run -a",
-    "version": "thoughtful changelog -o -a && npm run thought"
+    "compile": "tsc",
+    "prepublish": "yarn compile",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "dependencies": {
     "commander": "^2.11.0",
