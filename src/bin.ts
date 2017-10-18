@@ -19,7 +19,7 @@ function stringArray(arg: any, message: string): string[] {
 program
   .version(require('../package.json').version)
   .description(
-    'Convert all .graphqls schema-files in the current directory tree into typescript\n' +
+    'Convert all .graphql schema-files in the current directory tree into typescript\n' +
       'interfaces that can be used to implement a graphql-root for this schema.'
   )
   .option(
@@ -35,7 +35,7 @@ program
   )
   .option(
     '-i, --input <files>',
-    'a list of files to parse instead of globbing *.graphqls',
+    'a list of files to parse instead of globbing *.graphql',
     (current, last) => last.concat([current]),
     []
   )
