@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import program = require('commander')
-import { runCli } from '../runCli'
+import { runCli } from './runCli'
 
 function stringArray(arg: any, message: string): string[] {
   if (!arg) {

@@ -6,7 +6,7 @@
   "repository": "https://github.com/stipsan/graphql-field-resolver-to-typescript.git",
   "main": "dist/index.js",
   "bin": {
-    "graphql-typewriter": "dist/bin/graphql-typewriter.js"
+    "gqlfr2ts": "dist/bin.js"
   },
   "scripts": {
     "changelog:commit": "sr-changelog commit",
