@@ -9,8 +9,8 @@ export class Renderer {
   private options: Options
 
   /**
-     * Types that are not created as interface, because they are part of the introspection
-     */
+   * Types that are not created as interface, because they are part of the introspection
+   */
   private introspectionTypes: { [key: string]: boolean } = setOf([
     '__Schema',
     '__Type',
@@ -27,10 +27,8 @@ export class Renderer {
   }
 
   /**
-     * Render the whole schema as interface
-     * @param root
-     * @returns {string}
-     */
+   * Render the whole schema as interface
+   */
   render(root: Root): string {
     const namespace = source`
 type ID = string;
@@ -60,10 +58,8 @@ ${namespace.replace(/^\s+$/gm, '')}`
   }
 
   /**
-     * Render a list of type (i.e. interfaces)
-     * @param types
-     * @returns
-     */
+   * Render a list of type (i.e. interfaces)
+   */
   renderTypes(types: TypeDef[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
@@ -73,10 +69,8 @@ ${namespace.replace(/^\s+$/gm, '')}`
   }
 
   /**
-     * Render a Type (i.e. an interface)
-     * @param type
-     * @returns
-     */
+   * Render a Type (i.e. an interface)
+   */
   renderTypeDef(type: TypeDef, all: TypeDef[]): string {
     return source`
 ${this.renderComment(type.description)}
@@ -90,10 +84,8 @@ ${type.fields
   }
 
   /**
-     * Renders a __typename constant if the type is used in a union or interface.
-     * @param forType
-     * @param all
-     */
+   * Renders a __typename constant if the type is used in a union or interface.
+   */
   renderTypename(forType: string, all: TypeDef[]): string {
     const usedBy = all
       .filter(type => !this.introspectionTypes[type.name])
@@ -109,10 +101,8 @@ ${type.fields
   }
 
   /**
-     * Renders the extends clause of an interface (e.g. 'extends A, B. C').
-     * @param type
-     * @returns
-     */
+   * Renders the extends clause of an interface (e.g. 'extends A, B. C').
+   */
   renderExtends(type: TypeDef): string {
     if (type.interfaces && type.interfaces.length > 0) {
       const interfaces = type.interfaces.map(it => `${it.name}<Ctx>`).join(', ')
@@ -123,11 +113,8 @@ ${type.fields
   }
 
   /**
-     * Render a member (field or method) and its doc-comment
-     * @param field
-     * @param parentTypeName
-     * @returns
-     */
+   * Render a member (field or method) and its doc-comment
+   */
   renderMemberWithComment(field: Field, parentTypeName: string): string {
     return source`
 ${this.renderComment(field.description)}
@@ -136,11 +123,8 @@ ${this.renderMember(field, parentTypeName)}
   }
 
   /**
-     * Render a single field or method without doc-comment
-     * @param field
-     * @param parentTypeName
-     * @returns {string}
-     */
+   * Render a single field or method without doc-comment
+   */
   renderMember(field: Field, parentTypeName: string) {
     const optional = field.type.kind !== 'NON_NULL'
     const type = this.renderType(field.type, false)
@@ -154,9 +138,9 @@ ${this.renderMember(field, parentTypeName)}
   }
 
   /**
-     * Render a single return type (or field type)
-     * This function creates the base type that is then used as generic to a promise
-     */
+   * Render a single return type (or field type)
+   * This function creates the base type that is then used as generic to a promise
+   */
   renderType(type, optional: boolean) {
     function maybeOptional(arg) {
       return optional ? `(${arg} | undefined)` : arg
@@ -183,8 +167,8 @@ ${this.renderMember(field, parentTypeName)}
   }
 
   /**
-     * Render a description as doc-comment
-     */
+   * Render a description as doc-comment
+   */
   renderComment(description: string): string | typeof OMIT_NEXT_NEWLINE {
     if (!description) {
       // Parsed by the `source` tag-function to remove the next newline
@@ -194,8 +178,8 @@ ${this.renderMember(field, parentTypeName)}
   }
 
   /**
-     * Render the arguments of a function
-     */
+   * Render the arguments of a function
+   */
   renderArgumentType(args: Argument[]) {
     const base = args
       .map(arg => {
@@ -206,10 +190,8 @@ ${this.renderMember(field, parentTypeName)}
   }
 
   /**
-     * Render a list of enums.
-     * @param types
-     * @returns
-     */
+   * Render a list of enums.
+   */
   renderEnums(types: TypeDef[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
@@ -219,10 +201,8 @@ ${this.renderMember(field, parentTypeName)}
   }
 
   /**
-     * Render an Enum.
-     * @param type
-     * @returns
-     */
+   * Render an Enum.
+   */
   renderEnum(type: TypeDef): string {
     return source`
 ${this.renderComment(type.description)}
@@ -237,8 +217,8 @@ export const ${type.name}: { ${type.enumValues
   }
 
   /**
-     * Renders a type definition for an enum value.
-     */
+   * Renders a type definition for an enum value.
+   */
   renderEnumValueType(value: EnumValue): string {
     return source`
 ${value.name}: '${value.name}',
@@ -246,8 +226,8 @@ ${value.name}: '${value.name}',
   }
 
   /**
-     * Renders a the definition of an enum value.
-     */
+   * Renders a the definition of an enum value.
+   */
   renderEnumValue(value: EnumValue): string {
     return source`
 ${this.renderComment(value.description)}
@@ -256,10 +236,8 @@ ${value.name}: '${value.name}',
   }
 
   /**
-     * Render a list of unions.
-     * @param types
-     * @returns
-     */
+   * Render a list of unions.
+   */
   renderUnions(types: TypeDef[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
@@ -269,10 +247,8 @@ ${value.name}: '${value.name}',
   }
 
   /**
-     * Render a union.
-     * @param type
-     * @returns
-     */
+   * Render a union.
+   */
   renderUnion(type: TypeDef): string {
     // Scalars cannot be used in unions, so we're safe here
     const unionValues = type.possibleTypes
@@ -286,10 +262,8 @@ export type ${type.name}<Ctx> = ${unionValues}
   }
 
   /**
-     * Render a list of interfaces.
-     * @param types
-     * @returns
-     */
+   * Render a list of interfaces.
+   */
   renderInterfaces(types: TypeDef[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
@@ -299,10 +273,8 @@ export type ${type.name}<Ctx> = ${unionValues}
   }
 
   /**
-     * Render an interface.
-     * @param type
-     * @returns
-     */
+   * Render an interface.
+   */
   renderInterface(type: TypeDef): string {
     return source`
 ${this.renderComment(type.description)}
@@ -344,8 +316,8 @@ ${type.args.map(renderArg).join('\n')}
   }
 
   /**
-     * Render a list of input object.
-     */
+   * Render a list of input object.
+   */
   renderInputObjects(types: TypeDef[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
@@ -355,8 +327,8 @@ ${type.args.map(renderArg).join('\n')}
   }
 
   /**
-     * Render an input object.
-     */
+   * Render an input object.
+   */
   renderInputObject(type: TypeDef): string {
     return source`
 ${this.renderComment(type.description)}
@@ -369,8 +341,8 @@ export interface ${type.name} {
   }
 
   /**
-     * Render a input member (field or method) and its doc-comment
-     */
+   * Render a input member (field or method) and its doc-comment
+   */
   renderInputMemberWithComment(field: InputField): string {
     return source`
 ${this.renderComment(field.description)}
@@ -379,8 +351,8 @@ ${this.renderInputMember(field)}
   }
 
   /**
-     * Render a single input field or method without doc-comment
-     */
+   * Render a single input field or method without doc-comment
+   */
   renderInputMember(field: InputField) {
     const type = this.renderType(field.type, false)
     // Render property as field, with the option of being of a function-type () => ReturnValue
@@ -390,8 +362,8 @@ ${this.renderInputMember(field)}
   }
 
   /**
-     * Render a default resolver that implements resolveType for all unions and interfaces.
-     */
+   * Render a default resolver that implements resolveType for all unions and interfaces.
+   */
   renderDefaultResolvers(types: TypeDef[]): string {
     const resolvers = types
       .filter(type => !this.introspectionTypes[type.name])
@@ -405,8 +377,8 @@ ${resolvers}
   }
 
   /**
-     * Renders a single resolver.
-     */
+   * Renders a single resolver.
+   */
   renderResolver(type: TypeDef): string {
     return source`
     ${type.name}: {
