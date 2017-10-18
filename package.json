@@ -19,7 +19,16 @@
     "postcoverage": "istanbul check-coverage coverage/coverage-remapped.json --statements 100",
     "thought": "thought run -a",
     "version": "thoughtful changelog -o -a && npm run thought",
-    "prepublish": "npm run compile"
+    "prepublish": "npm run compile",
+    "changelog:preview": "sr-changelog",
+    "changelog:commit": "sr-changelog commit",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  },
+  "release": {
+    "analyzeCommits": "semantic-release-tamia/analyzeCommits",
+    "verifyConditions": "condition-circle",
+    "generateNotes": "semantic-release-tamia/generateNotes",
+    "verifyRelease": "semantic-release-tamia/verifyRelease"
   },
   "dependencies": {
     "commander": "^2.11.0",
