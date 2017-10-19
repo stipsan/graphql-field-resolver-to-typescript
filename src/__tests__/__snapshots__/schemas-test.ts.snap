@@ -314,15 +314,15 @@ export type GraphqlField<Source, Args, Result, Ctx> =
       info: GraphQLResolveInfo
     ) => Result | Promise<Result>)
 
-export interface Query<Ctx> {
+export interface RootQuery<Ctx> {
   /**
      * A field description
      */
-  field1?: GraphqlField<Query<Ctx>, {}, TypeA<Ctx> | undefined, Ctx>
+  field1?: GraphqlField<RootQuery<Ctx>, {}, TypeA<Ctx> | undefined, Ctx>
   /**
      * Another field description
      */
-  field2?: GraphqlField<Query<Ctx>, {}, TypeB<Ctx> | undefined, Ctx>
+  field2?: GraphqlField<RootQuery<Ctx>, {}, TypeB<Ctx> | undefined, Ctx>
 }
 
 /**

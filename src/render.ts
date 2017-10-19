@@ -5,12 +5,23 @@ import {
   IntrospectionInterfaceType,
   IntrospectionEnumType,
   IntrospectionInputObjectType,
+  IntrospectionInputValue,
+  IntrospectionTypeRef,
+  IntrospectionScalarType,
+  IntrospectionNamedTypeRef,
+  IntrospectionSchema,
 } from 'graphql'
-import { Root, Field, Argument, EnumValue, InputField } from './model'
+import { Root, Argument, EnumValue } from './model'
 import { source, OMIT_NEXT_NEWLINE } from './renderTag'
 
 export interface Options {
   tslint?: Object
+}
+
+type rootTypes = {
+  queryType: { name: string }
+  mutationType?: { name: string }
+  subscriptionType?: { name: string }
 }
 
 export class Renderer {
@@ -35,6 +46,21 @@ export class Renderer {
   }
 
   /**
+   * Extract queryType, mutationType and subscriptionType
+   */
+  extractRootTypesFromSchema(schema: IntrospectionSchema) {
+    return {
+      queryType: schema.queryType.name,
+      mutationType: schema.mutationType
+        ? schema.mutationType.name
+        : Symbol('mutationType'),
+      subscriptionType: schema.subscriptionType
+        ? schema.subscriptionType.name
+        : Symbol('subscriptionType'),
+    }
+  }
+
+  /**
    * Render the whole schema as interface
    */
   render(root: Root): string {
@@ -51,7 +77,10 @@ export class Renderer {
         ) => Result | Promise<Result>)
 
 ${this.renderTypes(root.data.__schema.types)}
-${this.renderArguments(root.data.__schema.types)}
+${this.renderArguments(
+      root.data.__schema.types,
+      this.extractRootTypesFromSchema(root.data.__schema)
+    )}
 ${this.renderInputObjects(root.data.__schema.types)}
 ${this.renderEnums(root.data.__schema.types)}
 ${this.renderUnions(root.data.__schema.types)}
@@ -127,7 +156,10 @@ ${type.fields
   /**
    * Render a member (field or method) and its doc-comment
    */
-  renderMemberWithComment(field: Field, parentTypeName: string): string {
+  renderMemberWithComment(
+    field: IntrospectionType,
+    parentTypeName: string
+  ): string {
     return source`
 ${this.renderComment(field.description)}
 ${this.renderMember(field, parentTypeName)}
@@ -137,7 +169,7 @@ ${this.renderMember(field, parentTypeName)}
   /**
    * Render a single field or method without doc-comment
    */
-  renderMember(field: Field, parentTypeName: string) {
+  renderMember(field: IntrospectionScalarType, parentTypeName: string) {
     const optional = field.type.kind !== 'NON_NULL'
     const type = this.renderType(field.type, false)
     const resultType = optional ? `${type} | undefined` : type
@@ -153,7 +185,7 @@ ${this.renderMember(field, parentTypeName)}
    * Render a single return type (or field type)
    * This function creates the base type that is then used as generic to a promise
    */
-  renderType(type: IntrospectionType, optional: boolean) {
+  renderType(type: IntrospectionTypeRef, optional: boolean) {
     function maybeOptional(arg: any) {
       return optional ? `(${arg} | undefined)` : arg
     }
@@ -254,7 +286,7 @@ ${value.name}: '${value.name}',
     return types
       .filter(type => !this.introspectionTypes[type.name])
       .filter(type => type.kind === 'UNION')
-      .map(type => this.renderUnion(type))
+      .map((type: IntrospectionUnionType) => this.renderUnion(type))
       .join('\n')
   }
 
@@ -280,7 +312,7 @@ export type ${type.name}<Ctx> = ${unionValues}
     return types
       .filter(type => !this.introspectionTypes[type.name])
       .filter(type => type.kind === 'INTERFACE')
-      .map(type => this.renderInterface(type))
+      .map((type: IntrospectionInterfaceType) => this.renderInterface(type))
       .join('\n')
   }
 
@@ -298,16 +330,27 @@ export interface ${type.name}<Ctx> {
 `
   }
 
-  renderArguments(types) {
+  renderArguments(
+    types: IntrospectionType[],
+    {
+      queryType,
+      mutationType,
+      subscriptionType,
+    }: {
+      queryType: string
+      mutationType: string | symbol
+      subscriptionType?: string | symbol
+    }
+  ) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
       .filter(
         type =>
-          type.name === 'Mutation' ||
-          type.name === 'Query' ||
-          type.name === 'Subscription'
+          type.name === queryType ||
+          type.name === mutationType ||
+          (subscriptionType !== undefined && type.name === subscriptionType)
       )
-      .map(type => type.fields)
+      .map((type: IntrospectionObjectType) => type.fields)
       .reduce((memo, fields) => memo.concat(fields), [])
       .map(type => renderInputsInterfaces(type, types))
       .join('')
@@ -320,7 +363,7 @@ ${type.args.map(renderArg).join('\n')}
 `
     }
 
-    function renderArg(arg) {
+    function renderArg(arg: IntrospectionType) {
       const optional = arg.type.kind === 'NON_NULL' ? '' : '?'
       const type = arg.type.ofType ? arg.type.ofType.name : arg.type.name
       return `    ${arg.name}${optional}: ${type}`
@@ -355,7 +398,7 @@ export interface ${type.name} {
   /**
    * Render a input member (field or method) and its doc-comment
    */
-  renderInputMemberWithComment(field: InputField): string {
+  renderInputMemberWithComment(field: IntrospectionInputValue): string {
     return source`
 ${this.renderComment(field.description)}
 ${this.renderInputMember(field)}
@@ -365,7 +408,7 @@ ${this.renderInputMember(field)}
   /**
    * Render a single input field or method without doc-comment
    */
-  renderInputMember(field: InputField) {
+  renderInputMember(field: IntrospectionInputValue) {
     const type = this.renderType(field.type, false)
     // Render property as field, with the option of being of a function-type () => ReturnValue
     const optional = field.type.kind !== 'NON_NULL'
