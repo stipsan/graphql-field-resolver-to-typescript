@@ -13,12 +13,51 @@ import {
   IntrospectionSchema,
   IntrospectionField,
   IntrospectionNonNullTypeRef,
+  IntrospectionEnumValue,
+  IntrospectionQuery,
 } from 'graphql'
-import { Root, EnumValue } from './model'
 import { source, OMIT_NEXT_NEWLINE } from './renderTag'
 
 export interface Options {
   tslint?: Object
+}
+
+function isScalar(x: IntrospectionTypeRef): x is IntrospectionScalarType {
+  return x.kind === 'SCALAR'
+}
+
+function isEnum(x: IntrospectionTypeRef): x is IntrospectionEnumType {
+  return x.kind === 'ENUM'
+}
+
+function isInputObject(
+  x: IntrospectionTypeRef
+): x is IntrospectionInputObjectType {
+  return x.kind === 'INPUT_OBJECT'
+}
+
+function isUnion(x: IntrospectionTypeRef): x is IntrospectionUnionType {
+  return x.kind === 'UNION'
+}
+
+function isNonNull(x: IntrospectionTypeRef): x is IntrospectionNonNullTypeRef {
+  return x.kind === 'NON_NULL'
+}
+
+function isInterface(x: IntrospectionTypeRef): x is IntrospectionInterfaceType {
+  return x.kind === 'INTERFACE'
+}
+
+function isObject(x: IntrospectionTypeRef): x is IntrospectionObjectType {
+  return x.kind === 'OBJECT'
+}
+
+function isList(x: IntrospectionTypeRef): x is IntrospectionListTypeRef {
+  return x.kind === 'LIST'
+}
+
+function isNamed(x: IntrospectionTypeRef): x is IntrospectionNamedTypeRef {
+  return {}.hasOwnProperty.call(x, 'name')
 }
 
 const scalars: { [key: string]: string } = {
@@ -71,7 +110,7 @@ export class Renderer {
   /**
    * Render the whole schema as interface
    */
-  render(root: Root): string {
+  render(root: { data: IntrospectionQuery }): string {
     const namespace = source`
       type ID = string;
       export type GraphqlField<Source, Args, Result, Ctx> =
@@ -193,7 +232,7 @@ ${this.renderMember(field, parentTypeName)}
    * Render a single return type (or field type)
    * This function creates the base type that is then used as generic to a promise
    */
-  renderType(type: IntrospectionTypeRef, optional: boolean): string | void {
+  renderType(type: IntrospectionTypeRef, optional: boolean): string {
     function maybeOptional(arg: any) {
       return optional ? `(${arg} | undefined)` : arg
     }
@@ -201,21 +240,33 @@ ${this.renderMember(field, parentTypeName)}
       return `${arg}<Ctx>`
     }
 
-    switch (type.kind) {
-      case 'SCALAR':
-        return maybeOptional(scalars[type.name])
-      case 'ENUM':
-      case 'INPUT_OBJECT':
-        return maybeOptional(type.name)
-      case 'OBJECT':
-      case 'UNION':
-      case 'INTERFACE':
-        return maybeOptional(generic(type.name))
-      case 'LIST':
-        return maybeOptional(`${this.renderType(type.ofType, true)}[]`)
-      case 'NON_NULL':
-        return this.renderType(type.ofType, false)
+    if (isScalar(type)) {
+      if (!scalars.hasOwnProperty(type.name)) {
+        throw new TypeError(
+          `Invalid argument: ${type.name} is not a supported SCALAR`
+        )
+      }
+
+      return maybeOptional(scalars[type.name])
     }
+
+    if (isEnum(type) || isInputObject(type)) {
+      return maybeOptional(type.name)
+    }
+
+    if (isObject(type) || isUnion(type) || isInterface(type)) {
+      return maybeOptional(generic(type.name))
+    }
+
+    if (isList(type) && type.ofType) {
+      return maybeOptional(`${this.renderType(type.ofType, true)}[]`)
+    }
+
+    if (isNonNull(type) && type.ofType) {
+      return this.renderType(type.ofType, false)
+    }
+
+    throw new TypeError(`Invalid argument: ${type.kind}`)
   }
 
   /**
@@ -271,7 +322,7 @@ export const ${type.name}: { ${type.enumValues
   /**
    * Renders a type definition for an enum value.
    */
-  renderEnumValueType(value: EnumValue): string {
+  renderEnumValueType(value: IntrospectionEnumValue): string {
     return source`
 ${value.name}: '${value.name}',
 `
@@ -280,7 +331,7 @@ ${value.name}: '${value.name}',
   /**
    * Renders a the definition of an enum value.
    */
-  renderEnumValue(value: EnumValue): string {
+  renderEnumValue(value: IntrospectionEnumValue): string {
     return source`
 ${this.renderComment(value.description)}
 ${value.name}: '${value.name}',
@@ -371,33 +422,17 @@ ${type.args.map(renderArg).join('\n')}
 `
     }
 
-    function isNonNull(
-      x: IntrospectionTypeRef
-    ): x is IntrospectionNonNullTypeRef {
-      return x.kind === 'NON_NULL'
-    }
-
-    function isList(x: IntrospectionTypeRef): x is IntrospectionListTypeRef {
-      return x.kind === 'LIST'
-    }
-
-    function isNamed(x: IntrospectionTypeRef): x is IntrospectionNamedTypeRef {
-      return {}.hasOwnProperty.call(x, 'name')
-    }
-
     function getTypeRefName(typeRef: IntrospectionTypeRef) {
       if (isNonNull(typeRef) || isList(typeRef)) {
-        if (
-          typeRef.ofType &&
-          isNamed(typeRef.ofType) &&
-          scalars.hasOwnProperty(typeRef.ofType.name)
-        ) {
-          return scalars[typeRef.ofType.name]
+        if (typeRef.ofType && isNamed(typeRef.ofType)) {
+          return typeRef.ofType.kind === 'SCALAR'
+            ? typeRef.ofType.name
+            : typeRef.ofType.kind
         }
       }
 
       if (isNamed(typeRef) && scalars.hasOwnProperty(typeRef.name)) {
-        return scalars[typeRef.name]
+        return typeRef.kind === 'SCALAR' ? typeRef.name : typeRef.kind
       }
 
       return 'any'

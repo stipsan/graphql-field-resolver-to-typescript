@@ -19,8 +19,8 @@ export interface Query<Ctx> {
 }
 
 export interface field1Args {
-  a?: string
-  b?: number
+  a?: String
+  b?: Int
 }
 
 export const defaultResolvers = {}
@@ -180,8 +180,8 @@ export interface Mutation<Ctx> {
 export interface valuesArgs {}
 
 export interface simpleMutationArgs {
-  key: string
-  value?: string
+  key: ID
+  value?: String
 }
 
 export interface commandMutationArgs {
@@ -386,7 +386,7 @@ export interface B<Ctx> {
 export interface singleArgs {}
 
 export interface aOrBArgs {
-  a?: number
+  a?: Int
 }
 
 export type Single<Ctx> = A<Ctx>
