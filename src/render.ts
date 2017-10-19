@@ -18,19 +18,13 @@ export interface Options {
   tslint?: Object
 }
 
-type rootTypes = {
-  queryType: { name: string }
-  mutationType?: { name: string }
-  subscriptionType?: { name: string }
-}
-
 export class Renderer {
   private options: Options
 
   /**
    * Types that are not created as interface, because they are part of the introspection
    */
-  private introspectionTypes: { [key: string]: boolean } = setOf([
+  private introspectionTypes: Set<string> = new Set([
     '__Schema',
     '__Type',
     '__TypeKind',
@@ -47,6 +41,9 @@ export class Renderer {
 
   /**
    * Extract queryType, mutationType and subscriptionType
+   *
+   * Since mutationType and subscriptionType is optional they will only be strings if they exist-
+   * By using symbols instead of null or undefined we avoid matching against nodes that don't have a name.
    */
   extractRootTypesFromSchema(schema: IntrospectionSchema) {
     return {
@@ -100,7 +97,7 @@ ${this.renderDefaultResolvers(root.data.__schema.types)}
    */
   renderTypes(types: IntrospectionType[]) {
     return types
-      .filter(type => !this.introspectionTypes[type.name])
+      .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'OBJECT')
       .map(type => this.renderTypeDef(type, types))
       .join('\n\n')
@@ -129,7 +126,7 @@ ${type.fields
    */
   renderTypename(forType: string, all: IntrospectionType[]): string {
     const usedBy = all
-      .filter(type => !this.introspectionTypes[type.name])
+      .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'UNION' || type.kind === 'INTERFACE')
       .filter(
         type =>
@@ -238,7 +235,7 @@ ${this.renderMember(field, parentTypeName)}
    */
   renderEnums(types: IntrospectionType[]) {
     return types
-      .filter(type => !this.introspectionTypes[type.name])
+      .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'ENUM')
       .map(type => this.renderEnum(type))
       .join('\n')
@@ -284,7 +281,7 @@ ${value.name}: '${value.name}',
    */
   renderUnions(types: IntrospectionType[]) {
     return types
-      .filter(type => !this.introspectionTypes[type.name])
+      .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'UNION')
       .map((type: IntrospectionUnionType) => this.renderUnion(type))
       .join('\n')
@@ -310,7 +307,7 @@ export type ${type.name}<Ctx> = ${unionValues}
    */
   renderInterfaces(types: IntrospectionType[]) {
     return types
-      .filter(type => !this.introspectionTypes[type.name])
+      .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'INTERFACE')
       .map((type: IntrospectionInterfaceType) => this.renderInterface(type))
       .join('\n')
@@ -343,7 +340,7 @@ export interface ${type.name}<Ctx> {
     }
   ) {
     return types
-      .filter(type => !this.introspectionTypes[type.name])
+      .filter(type => !this.introspectionTypes.has(type.name))
       .filter(
         type =>
           type.name === queryType ||
@@ -375,7 +372,7 @@ ${type.args.map(renderArg).join('\n')}
    */
   renderInputObjects(types: IntrospectionType[]) {
     return types
-      .filter(type => !this.introspectionTypes[type.name])
+      .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'INPUT_OBJECT')
       .map(type => this.renderInputObject(type))
       .join('\n')
@@ -421,7 +418,7 @@ ${this.renderInputMember(field)}
    */
   renderDefaultResolvers(types: IntrospectionType[]): string {
     const resolvers = types
-      .filter(type => !this.introspectionTypes[type.name])
+      .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'UNION' || type.kind === 'INTERFACE')
       .map(type => this.renderResolver(type))
       .join(',\n')
@@ -450,14 +447,4 @@ const scalars = {
   Float: 'number',
   Boolean: 'boolean',
   ID: 'string',
-}
-
-/**
- * Covert an array of strings into an object in which each string is a key with value 'true'
- */
-function setOf(array: string[]): { [key: string]: boolean } {
-  return array.reduce((set, current): { [key: string]: boolean } => {
-    set[current] = true
-    return set
-  }, {})
 }
