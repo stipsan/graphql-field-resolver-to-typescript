@@ -1,5 +1,7 @@
 # graphql-field-resolver-to-typescript &middot; [![CircleCI Status](https://img.shields.io/circleci/project/github/stipsan/graphql-field-resolver-to-typescript.svg?style=flat-square&label=circleci)](https://circleci.com/gh/stipsan/graphql-field-resolver-to-typescript) [![npm version](https://img.shields.io/npm/v/graphql-field-resolver-to-typescript.svg?style=flat-square)](https://www.npmjs.com/package/graphql-field-resolver-to-typescript) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
 
+> This project started its life as a fork of [graphql-typewriter](https://www.npmjs.com/package/graphql-typewriter)
+
 # Usage
 
 ## &nbsp;&nbsp;🚗 Local package.json
