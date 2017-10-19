@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// @TODO simplify, a lot
+
 import program = require('commander')
 import { runCli } from './runCli'
 
