@@ -14,13 +14,13 @@
     "precommit": "lint-staged",
     "compile": "tsc",
     "prepublish": "yarn compile",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "test": "jest"
   },
   "dependencies": {
     "get-stdin": "^5.0.1",
-    "graphql": "^0.10.5",
-    "graphql-subscriptions": "^0.4.4",
-    "graphql-tools": "^1.1.0",
+    "graphql": "^0.11.7",
+    "graphql-tools": "^2.5.1",
     "meow": "^3.7.0",
     "prettier": "^1.7.4"
   },
