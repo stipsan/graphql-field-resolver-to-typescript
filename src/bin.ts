@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-// @TODO simplify, a lot
-
 import { runCli } from './runCli'
 import * as meow from 'meow'
 
@@ -11,7 +9,7 @@ const cli = meow(
     '  $ gqlfr2ts [<input> ...]',
     '',
     'Options:',
-    '  --output, -o path          Specifies the name and location of the output file. If not specified, stdout is used.',
+    '  --output, -o path  Specifies the name and location of the output file. If not specified, stdout is used.',
     '',
     'Examples:',
     '  $ gqlfr2ts schema.graphql',
@@ -26,28 +24,30 @@ const cli = meow(
   ],
   {
     string: ['output'],
-    alias: {
-      o: 'output',
-      h: 'help',
-    },
+    alias: { o: 'output', h: 'help' },
   }
 )
 
-// wrap in async function for simplicity
-if (cli.input.length === 0 && !cli.flags.stdin) {
-  // check if it is needed to show an error
-  process.stderr.write('\nNo input specified.\n')
-  cli.showHelp()
+// most amazing trick ever, since node don't allow `await` on the top level 😜
+const run = async () => {
+  if (cli.input.length === 0 && !cli.flags.stdin) {
+    // check if it is needed to show an error
+    process.stderr.write('\nNo input specified.\n')
+    cli.showHelp()
+  }
+
+  // if input is specified use that and ignore stdin
+
+  // use stdin
+
+  // if neither, show error
+
+  // proceed with script using input
+
+  // if no -output is specified, output with console.log
+
+  // if output is set, write to file
 }
 
-// if input is specified use that and ignore stdin
-
-// use stdin
-
-// if neither, show error
-
-// proceed with script using input
-
-// if no -output is specified, output with console.log
-
-// if output is set, write to file
+// fire away!
+run()
