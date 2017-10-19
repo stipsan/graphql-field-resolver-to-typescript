@@ -32,17 +32,16 @@ export class Renderer {
    */
   render(root: Root): string {
     const namespace = source`
-type ID = string;
-export type GraphqlField<Source, Args, Result, Ctx> =
-  Result |
-  Promise<Result> |
-  (
-    ( source:Source,
-      args:Args,
-      context:Ctx,
-      info:GraphQLResolveInfo
-    ) => Result | Promise<Result>
-  )
+      type ID = string;
+      export type GraphqlField<Source, Args, Result, Ctx> =
+      | Result
+      | Promise<Result>
+      | ((
+          source: Source,
+          args: Args,
+          context: Ctx,
+          info: GraphQLResolveInfo
+        ) => Result | Promise<Result>)
 
 ${this.renderTypes(root.data.__schema.types)}
 ${this.renderArguments(root.data.__schema.types)}
@@ -53,9 +52,11 @@ ${this.renderInterfaces(root.data.__schema.types)}
 ${this.renderDefaultResolvers(root.data.__schema.types)}
 `
 
-    return `/* tslint:disable */
-import {GraphQLResolveInfo} from "graphql";
-${namespace.replace(/^\s+$/gm, '')}`
+    return `
+      /* tslint:disable */
+      import {GraphQLResolveInfo} from "graphql";
+      ${namespace.replace(/^\s+$/gm, '')}
+    `
   }
 
   /**

@@ -4,6 +4,7 @@
   "author": "Stian Didriksen <stipsan@gmail.com>",
   "license": "MIT",
   "repository": "https://github.com/stipsan/graphql-field-resolver-to-typescript.git",
+  "version": "0.2.0",
   "main": "dist/index.js",
   "bin": {
     "gqlfr2ts": "dist/bin.js"
