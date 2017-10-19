@@ -21,7 +21,8 @@
     "graphql": "^0.10.5",
     "graphql-subscriptions": "^0.4.4",
     "graphql-tools": "^1.1.0",
-    "meow": "^3.7.0"
+    "meow": "^3.7.0",
+    "prettier": "^1.7.4"
   },
   "devDependencies": {
     "@types/get-stdin": "^5.0.1",
@@ -29,10 +30,10 @@
     "@types/jest": "^21.1.4",
     "@types/meow": "^3.6.2",
     "@types/node": "^8.0.45",
+    "@types/prettier": "^1.7.0",
     "husky": "^0.14.3",
     "jest": "^21.2.1",
     "lint-staged": "^4.3.0",
-    "prettier": "^1.7.4",
     "prettier-package-json": "^1.4.0",
     "release-relief": "^1.0.1",
     "ts-jest": "^21.1.3",

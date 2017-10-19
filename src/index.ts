@@ -5,6 +5,7 @@ import {
   IntrospectionQuery,
   GraphQLError,
 } from 'graphql'
+import { format } from 'prettier'
 import { Renderer } from './render'
 
 interface ExecutionResult {
@@ -21,6 +22,11 @@ export class Converter {
       introspectionQuery,
       {}
     )) as ExecutionResult
-    return renderer.render(introSpection)
+    const result = await renderer.render(introSpection)
+    return format(result, {
+      parser: 'typescript',
+      singleQuote: true,
+      semi: false,
+    })
   }
 }
