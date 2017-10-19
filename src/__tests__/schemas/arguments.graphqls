@@ -1,3 +1,0 @@
-type Query {
-    field1(a:String, b:Int = 3): String
-}
