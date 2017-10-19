@@ -1,0 +1,415 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should handle arguments.graphql correctly 1`] = `
+"/* tslint:disable */
+import {GraphQLResolveInfo} from \\"graphql\\";
+type ID = string;
+export type GraphqlField<Source, Args, Result, Ctx> =
+  Result |
+  Promise<Result> |
+  (
+    ( source:Source,
+      args:Args,
+      context:Ctx,
+      info:GraphQLResolveInfo
+    ) => Result | Promise<Result>
+  )
+
+export interface Query<Ctx> {
+    field1?: GraphqlField<Query<Ctx>, field1Args, string | undefined, Ctx>
+}
+
+export interface field1Args {
+    a?: String
+    b?: Int
+}
+
+export const defaultResolvers = {
+
+};"
+`;
+
+exports[`should handle enum.graphql correctly 1`] = `
+"/* tslint:disable */
+import {GraphQLResolveInfo} from \\"graphql\\";
+type ID = string;
+export type GraphqlField<Source, Args, Result, Ctx> =
+  Result |
+  Promise<Result> |
+  (
+    ( source:Source,
+      args:Args,
+      context:Ctx,
+      info:GraphQLResolveInfo
+    ) => Result | Promise<Result>
+  )
+
+export interface Query<Ctx> {
+    state: GraphqlField<Query<Ctx>, {}, STATE, Ctx>
+    optionalState?: GraphqlField<Query<Ctx>, {}, STATE | undefined, Ctx>
+}
+
+export interface stateArgs {
+
+}
+
+export interface optionalStateArgs {
+
+}
+
+export type STATE = 'OPEN' | 'CLOSED' | 'DELETED'
+export const STATE: { OPEN: 'OPEN', CLOSED: 'CLOSED', DELETED: 'DELETED', } = { OPEN: 'OPEN', CLOSED: 'CLOSED', /**
+                                                                                 * permanently deleted
+                                                                                 */
+                                                                                DELETED: 'DELETED',}
+
+export const defaultResolvers = {
+
+};"
+`;
+
+exports[`should handle interface.graphql correctly 1`] = `
+"/* tslint:disable */
+import {GraphQLResolveInfo} from \\"graphql\\";
+type ID = string;
+export type GraphqlField<Source, Args, Result, Ctx> =
+  Result |
+  Promise<Result> |
+  (
+    ( source:Source,
+      args:Args,
+      context:Ctx,
+      info:GraphQLResolveInfo
+    ) => Result | Promise<Result>
+  )
+
+export interface Query<Ctx> {
+    characters?: GraphqlField<Query<Ctx>, {}, (Character<Ctx> | undefined)[] | undefined, Ctx>
+}
+
+export interface Human<Ctx> extends Character<Ctx> {
+    __typename: 'Human'
+    id: GraphqlField<Human<Ctx>, {}, string, Ctx>
+    name: GraphqlField<Human<Ctx>, {}, string, Ctx>
+    friends?: GraphqlField<Human<Ctx>, {}, (Character<Ctx> | undefined)[] | undefined, Ctx>
+}
+
+export interface Droid<Ctx> extends Character<Ctx>, Functional<Ctx> {
+    __typename: 'Droid'
+    id: GraphqlField<Droid<Ctx>, {}, string, Ctx>
+    name: GraphqlField<Droid<Ctx>, {}, string, Ctx>
+    primaryFunction?: GraphqlField<Droid<Ctx>, {}, string | undefined, Ctx>
+}
+
+export interface charactersArgs {
+
+}
+
+/**
+ * A character
+ */
+export interface Character<Ctx> {
+    id: GraphqlField<Character<Ctx>, {}, string, Ctx>
+    name: GraphqlField<Character<Ctx>, {}, string, Ctx>
+}
+export interface Functional<Ctx> {
+    primaryFunction?: GraphqlField<Functional<Ctx>, {}, string | undefined, Ctx>
+}
+
+export const defaultResolvers = {
+    Character: {
+        __resolveType(obj) {
+            return obj.__typename
+        }
+    },
+    Functional: {
+        __resolveType(obj) {
+            return obj.__typename
+        }
+    }
+};"
+`;
+
+exports[`should handle mutation.graphql correctly 1`] = `
+"/* tslint:disable */
+import {GraphQLResolveInfo} from \\"graphql\\";
+type ID = string;
+export type GraphqlField<Source, Args, Result, Ctx> =
+  Result |
+  Promise<Result> |
+  (
+    ( source:Source,
+      args:Args,
+      context:Ctx,
+      info:GraphQLResolveInfo
+    ) => Result | Promise<Result>
+  )
+
+export interface Query<Ctx> {
+    values?: GraphqlField<Query<Ctx>, {}, (KeyValue<Ctx> | undefined)[] | undefined, Ctx>
+}
+
+export interface KeyValue<Ctx> {
+    key: GraphqlField<KeyValue<Ctx>, {}, string, Ctx>
+    value?: GraphqlField<KeyValue<Ctx>, {}, string | undefined, Ctx>
+}
+
+export interface Mutation<Ctx> {
+    simpleMutation?: GraphqlField<Mutation<Ctx>, simpleMutationArgs, (KeyValue<Ctx> | undefined)[] | undefined, Ctx>
+    commandMutation?: GraphqlField<Mutation<Ctx>, commandMutationArgs, (KeyValue<Ctx> | undefined)[] | undefined, Ctx>
+}
+
+export interface valuesArgs {
+
+}
+
+export interface simpleMutationArgs {
+    key: ID
+    value?: String
+}
+
+export interface commandMutationArgs {
+    cmd?: SetValueCommand
+}
+
+/**
+ * Set a key to a value
+ */
+export interface SetValueCommand {
+    key: string
+    value?: string
+}
+
+export const defaultResolvers = {
+
+};"
+`;
+
+exports[`should handle required.graphql correctly 1`] = `
+"/* tslint:disable */
+import {GraphQLResolveInfo} from \\"graphql\\";
+type ID = string;
+export type GraphqlField<Source, Args, Result, Ctx> =
+  Result |
+  Promise<Result> |
+  (
+    ( source:Source,
+      args:Args,
+      context:Ctx,
+      info:GraphQLResolveInfo
+    ) => Result | Promise<Result>
+  )
+
+export interface Query<Ctx> {
+    requiredStringField: GraphqlField<Query<Ctx>, {}, string, Ctx>
+    optionalStringField?: GraphqlField<Query<Ctx>, {}, string | undefined, Ctx>
+    requiredIntField: GraphqlField<Query<Ctx>, {}, number, Ctx>
+    requiredObjectField: GraphqlField<Query<Ctx>, {}, A<Ctx>, Ctx>
+    requiredListOfOptionals: GraphqlField<Query<Ctx>, {}, (string | undefined)[], Ctx>
+    optionalListOfOptionals?: GraphqlField<Query<Ctx>, {}, (string | undefined)[] | undefined, Ctx>
+    requiredListOfRequired: GraphqlField<Query<Ctx>, {}, string[], Ctx>
+    optionalListOfRequired?: GraphqlField<Query<Ctx>, {}, string[] | undefined, Ctx>
+}
+
+export interface A<Ctx> {
+    name: GraphqlField<A<Ctx>, {}, string, Ctx>
+}
+
+export interface requiredStringFieldArgs {
+
+}
+
+export interface optionalStringFieldArgs {
+
+}
+
+export interface requiredIntFieldArgs {
+
+}
+
+export interface requiredObjectFieldArgs {
+
+}
+
+export interface requiredListOfOptionalsArgs {
+
+}
+
+export interface optionalListOfOptionalsArgs {
+
+}
+
+export interface requiredListOfRequiredArgs {
+
+}
+
+export interface optionalListOfRequiredArgs {
+
+}
+
+export const defaultResolvers = {
+
+};"
+`;
+
+exports[`should handle scalars.graphql correctly 1`] = `
+"/* tslint:disable */
+import {GraphQLResolveInfo} from \\"graphql\\";
+type ID = string;
+export type GraphqlField<Source, Args, Result, Ctx> =
+  Result |
+  Promise<Result> |
+  (
+    ( source:Source,
+      args:Args,
+      context:Ctx,
+      info:GraphQLResolveInfo
+    ) => Result | Promise<Result>
+  )
+
+export interface Query<Ctx> {
+    stringField?: GraphqlField<Query<Ctx>, {}, string | undefined, Ctx>
+    booleanField?: GraphqlField<Query<Ctx>, {}, boolean | undefined, Ctx>
+    intField?: GraphqlField<Query<Ctx>, {}, number | undefined, Ctx>
+    floatField?: GraphqlField<Query<Ctx>, {}, number | undefined, Ctx>
+    idField?: GraphqlField<Query<Ctx>, {}, string | undefined, Ctx>
+}
+
+export interface stringFieldArgs {
+
+}
+
+export interface booleanFieldArgs {
+
+}
+
+export interface intFieldArgs {
+
+}
+
+export interface floatFieldArgs {
+
+}
+
+export interface idFieldArgs {
+
+}
+
+export const defaultResolvers = {
+
+};"
+`;
+
+exports[`should handle simpleSchema.graphql correctly 1`] = `
+"/* tslint:disable */
+import {GraphQLResolveInfo} from \\"graphql\\";
+type ID = string;
+export type GraphqlField<Source, Args, Result, Ctx> =
+  Result |
+  Promise<Result> |
+  (
+    ( source:Source,
+      args:Args,
+      context:Ctx,
+      info:GraphQLResolveInfo
+    ) => Result | Promise<Result>
+  )
+
+export interface Query<Ctx> {
+    /**
+     * A field description
+     */
+    field1?: GraphqlField<Query<Ctx>, {}, TypeA<Ctx> | undefined, Ctx>
+    /**
+     * Another field description
+     */
+    field2?: GraphqlField<Query<Ctx>, {}, TypeB<Ctx> | undefined, Ctx>
+}
+
+/**
+ * A simple type
+ * Multiline description
+ */
+export interface TypeA<Ctx> {
+    name?: GraphqlField<TypeA<Ctx>, {}, string | undefined, Ctx>
+    size?: GraphqlField<TypeA<Ctx>, {}, number | undefined, Ctx>
+}
+
+/**
+ * Another more complex type
+ */
+export interface TypeB<Ctx> {
+    nested?: GraphqlField<TypeB<Ctx>, {}, (TypeA<Ctx> | undefined)[] | undefined, Ctx>
+}
+
+export interface field1Args {
+
+}
+
+export interface field2Args {
+
+}
+
+export const defaultResolvers = {
+
+};"
+`;
+
+exports[`should handle union.graphql correctly 1`] = `
+"/* tslint:disable */
+import {GraphQLResolveInfo} from \\"graphql\\";
+type ID = string;
+export type GraphqlField<Source, Args, Result, Ctx> =
+  Result |
+  Promise<Result> |
+  (
+    ( source:Source,
+      args:Args,
+      context:Ctx,
+      info:GraphQLResolveInfo
+    ) => Result | Promise<Result>
+  )
+
+export interface Query<Ctx> {
+    single?: GraphqlField<Query<Ctx>, {}, Single<Ctx> | undefined, Ctx>
+    aOrB?: GraphqlField<Query<Ctx>, aOrBArgs, AOrB<Ctx> | undefined, Ctx>
+}
+
+export interface A<Ctx> {
+    __typename: 'A'
+    aName?: GraphqlField<A<Ctx>, {}, string | undefined, Ctx>
+}
+
+export interface B<Ctx> {
+    __typename: 'B'
+    bName?: GraphqlField<B<Ctx>, {}, string | undefined, Ctx>
+}
+
+export interface singleArgs {
+
+}
+
+export interface aOrBArgs {
+    a?: Int
+}
+
+export type Single<Ctx> = A<Ctx>
+
+/**
+ * A or B
+ */
+export type AOrB<Ctx> = A<Ctx> | B<Ctx>
+
+export const defaultResolvers = {
+    Single: {
+        __resolveType(obj) {
+            return obj.__typename
+        }
+    },
+    AOrB: {
+        __resolveType(obj) {
+            return obj.__typename
+        }
+    }
+};"
+`;

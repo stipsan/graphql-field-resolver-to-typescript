@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { runCli } from './runCli'
+import { Converter } from '.'
 import * as meow from 'meow'
 import * as fs from 'fs'
 import { promisify } from 'util'
@@ -53,9 +53,8 @@ const run = async () => {
     cli.showHelp()
   }
 
-  // proceed with script using input
-  // @TODO temp
-  const output = schema
+  const converter = new Converter()
+  const output = await converter.convert(schema)
 
   if (cli.flags.output) {
     return await writeFileAsync(cli.flags.output, output)

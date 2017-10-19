@@ -1,3 +1,4 @@
+import { IntrospectionType } from 'graphql'
 import { Root, TypeDef, Field, Argument, EnumValue, InputField } from './model'
 import { source, OMIT_NEXT_NEWLINE } from './renderTag'
 

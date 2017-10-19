@@ -1,11 +1,8 @@
+import { IntrospectionQuery } from 'graphql'
 // @TODO is this stuff needed when we got @types/graphql?
 
 export interface Root {
-  data: {
-    __schema: {
-      types: TypeDef[]
-    }
-  }
+  data: IntrospectionQuery
 }
 
 export type Kind =
