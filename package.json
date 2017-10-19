@@ -12,6 +12,7 @@
     "changelog:commit": "sr-changelog commit",
     "changelog:preview": "sr-changelog",
     "precommit": "lint-staged",
+    "precompile": "rimraf dist",
     "compile": "tsc",
     "prepublish": "yarn compile",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
@@ -36,6 +37,7 @@
     "lint-staged": "^4.3.0",
     "prettier-package-json": "^1.4.0",
     "release-relief": "^1.0.1",
+    "rimraf": "^2.6.2",
     "ts-jest": "^21.1.3",
     "tslint": "^5.7.0",
     "typescript": "^2.5.3"
