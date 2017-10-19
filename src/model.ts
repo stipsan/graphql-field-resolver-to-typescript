@@ -19,17 +19,6 @@ export type Kind =
  * Model definition of the introspection result
  */
 
-export interface TypeDef {
-  name: string
-  kind: Kind
-  description: string
-  fields?: Field[]
-  enumValues?: EnumValue[]
-  possibleTypes?: Type[]
-  interfaces?: Type[]
-  inputFields: InputField[]
-}
-
 export class Field {
   name: string
   description: string

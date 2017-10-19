@@ -1,5 +1,12 @@
-import { IntrospectionType } from 'graphql'
-import { Root, TypeDef, Field, Argument, EnumValue, InputField } from './model'
+import {
+  IntrospectionType,
+  IntrospectionObjectType,
+  IntrospectionUnionType,
+  IntrospectionInterfaceType,
+  IntrospectionEnumType,
+  IntrospectionInputObjectType,
+} from 'graphql'
+import { Root, Field, Argument, EnumValue, InputField } from './model'
 import { source, OMIT_NEXT_NEWLINE } from './renderTag'
 
 export interface Options {
@@ -62,7 +69,7 @@ ${this.renderDefaultResolvers(root.data.__schema.types)}
   /**
    * Render a list of type (i.e. interfaces)
    */
-  renderTypes(types: TypeDef[]) {
+  renderTypes(types: IntrospectionType[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
       .filter(type => type.kind === 'OBJECT')
@@ -73,7 +80,10 @@ ${this.renderDefaultResolvers(root.data.__schema.types)}
   /**
    * Render a Type (i.e. an interface)
    */
-  renderTypeDef(type: TypeDef, all: TypeDef[]): string {
+  renderTypeDef(
+    type: IntrospectionObjectType,
+    all: IntrospectionType[]
+  ): string {
     return source`
 ${this.renderComment(type.description)}
 export interface ${type.name}<Ctx> ${this.renderExtends(type)}{
@@ -88,7 +98,7 @@ ${type.fields
   /**
    * Renders a __typename constant if the type is used in a union or interface.
    */
-  renderTypename(forType: string, all: TypeDef[]): string {
+  renderTypename(forType: string, all: IntrospectionType[]): string {
     const usedBy = all
       .filter(type => !this.introspectionTypes[type.name])
       .filter(type => type.kind === 'UNION' || type.kind === 'INTERFACE')
@@ -105,7 +115,7 @@ ${type.fields
   /**
    * Renders the extends clause of an interface (e.g. 'extends A, B. C').
    */
-  renderExtends(type: TypeDef): string {
+  renderExtends(type: IntrospectionType): string {
     if (type.interfaces && type.interfaces.length > 0) {
       const interfaces = type.interfaces.map(it => `${it.name}<Ctx>`).join(', ')
       return `extends ${interfaces} `
@@ -143,11 +153,11 @@ ${this.renderMember(field, parentTypeName)}
    * Render a single return type (or field type)
    * This function creates the base type that is then used as generic to a promise
    */
-  renderType(type, optional: boolean) {
-    function maybeOptional(arg) {
+  renderType(type: IntrospectionType, optional: boolean) {
+    function maybeOptional(arg: any) {
       return optional ? `(${arg} | undefined)` : arg
     }
-    function generic(arg) {
+    function generic(arg): any {
       return `${arg}<Ctx>`
     }
 
@@ -171,7 +181,7 @@ ${this.renderMember(field, parentTypeName)}
   /**
    * Render a description as doc-comment
    */
-  renderComment(description: string): string | typeof OMIT_NEXT_NEWLINE {
+  renderComment(description?: string): string | typeof OMIT_NEXT_NEWLINE {
     if (!description) {
       // Parsed by the `source` tag-function to remove the next newline
       return OMIT_NEXT_NEWLINE
@@ -194,7 +204,7 @@ ${this.renderMember(field, parentTypeName)}
   /**
    * Render a list of enums.
    */
-  renderEnums(types: TypeDef[]) {
+  renderEnums(types: IntrospectionType[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
       .filter(type => type.kind === 'ENUM')
@@ -205,7 +215,7 @@ ${this.renderMember(field, parentTypeName)}
   /**
    * Render an Enum.
    */
-  renderEnum(type: TypeDef): string {
+  renderEnum(type: IntrospectionEnumType): string {
     return source`
 ${this.renderComment(type.description)}
 export type ${type.name} = ${type.enumValues
@@ -240,7 +250,7 @@ ${value.name}: '${value.name}',
   /**
    * Render a list of unions.
    */
-  renderUnions(types: TypeDef[]) {
+  renderUnions(types: IntrospectionType[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
       .filter(type => type.kind === 'UNION')
@@ -251,7 +261,7 @@ ${value.name}: '${value.name}',
   /**
    * Render a union.
    */
-  renderUnion(type: TypeDef): string {
+  renderUnion(type: IntrospectionUnionType): string {
     // Scalars cannot be used in unions, so we're safe here
     const unionValues = type.possibleTypes
       .map(type => `${type.name}<Ctx>`)
@@ -266,7 +276,7 @@ export type ${type.name}<Ctx> = ${unionValues}
   /**
    * Render a list of interfaces.
    */
-  renderInterfaces(types: TypeDef[]) {
+  renderInterfaces(types: IntrospectionType[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
       .filter(type => type.kind === 'INTERFACE')
@@ -277,7 +287,7 @@ export type ${type.name}<Ctx> = ${unionValues}
   /**
    * Render an interface.
    */
-  renderInterface(type: TypeDef): string {
+  renderInterface(type: IntrospectionInterfaceType): string {
     return source`
 ${this.renderComment(type.description)}
 export interface ${type.name}<Ctx> {
@@ -320,7 +330,7 @@ ${type.args.map(renderArg).join('\n')}
   /**
    * Render a list of input object.
    */
-  renderInputObjects(types: TypeDef[]) {
+  renderInputObjects(types: IntrospectionType[]) {
     return types
       .filter(type => !this.introspectionTypes[type.name])
       .filter(type => type.kind === 'INPUT_OBJECT')
@@ -331,7 +341,7 @@ ${type.args.map(renderArg).join('\n')}
   /**
    * Render an input object.
    */
-  renderInputObject(type: TypeDef): string {
+  renderInputObject(type: IntrospectionInputObjectType): string {
     return source`
 ${this.renderComment(type.description)}
 export interface ${type.name} {
@@ -366,7 +376,7 @@ ${this.renderInputMember(field)}
   /**
    * Render a default resolver that implements resolveType for all unions and interfaces.
    */
-  renderDefaultResolvers(types: TypeDef[]): string {
+  renderDefaultResolvers(types: IntrospectionType[]): string {
     const resolvers = types
       .filter(type => !this.introspectionTypes[type.name])
       .filter(type => type.kind === 'UNION' || type.kind === 'INTERFACE')
@@ -381,7 +391,7 @@ ${resolvers}
   /**
    * Renders a single resolver.
    */
-  renderResolver(type: TypeDef): string {
+  renderResolver(type: IntrospectionType): string {
     return source`
     ${type.name}: {
         __resolveType(obj) {
