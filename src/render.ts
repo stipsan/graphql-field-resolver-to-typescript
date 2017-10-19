@@ -9,13 +9,24 @@ import {
   IntrospectionTypeRef,
   IntrospectionScalarType,
   IntrospectionNamedTypeRef,
+  IntrospectionListTypeRef,
   IntrospectionSchema,
+  IntrospectionField,
+  IntrospectionNonNullTypeRef,
 } from 'graphql'
-import { Root, Argument, EnumValue } from './model'
+import { Root, EnumValue } from './model'
 import { source, OMIT_NEXT_NEWLINE } from './renderTag'
 
 export interface Options {
   tslint?: Object
+}
+
+const scalars: { [key: string]: string } = {
+  String: 'string',
+  Int: 'number',
+  Float: 'number',
+  Boolean: 'boolean',
+  ID: 'string',
 }
 
 export class Renderer {
@@ -99,7 +110,7 @@ ${this.renderDefaultResolvers(root.data.__schema.types)}
     return types
       .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'OBJECT')
-      .map(type => this.renderTypeDef(type, types))
+      .map((type: IntrospectionObjectType) => this.renderTypeDef(type, types))
       .join('\n\n')
   }
 
@@ -129,19 +140,19 @@ ${type.fields
       .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'UNION' || type.kind === 'INTERFACE')
       .filter(
-        type =>
+        (type: IntrospectionUnionType | IntrospectionInterfaceType) =>
           type.possibleTypes.filter(cand => cand.name === forType).length > 0
       )
     if (usedBy.length === 0) {
       return ''
     }
-    return `__typename: '${forType}'\n`
+    return `__typename: '${forType}';`
   }
 
   /**
    * Renders the extends clause of an interface (e.g. 'extends A, B. C').
    */
-  renderExtends(type: IntrospectionType): string {
+  renderExtends(type: IntrospectionObjectType): string {
     if (type.interfaces && type.interfaces.length > 0) {
       const interfaces = type.interfaces.map(it => `${it.name}<Ctx>`).join(', ')
       return `extends ${interfaces} `
@@ -154,7 +165,7 @@ ${type.fields
    * Render a member (field or method) and its doc-comment
    */
   renderMemberWithComment(
-    field: IntrospectionType,
+    field: IntrospectionField,
     parentTypeName: string
   ): string {
     return source`
@@ -166,7 +177,7 @@ ${this.renderMember(field, parentTypeName)}
   /**
    * Render a single field or method without doc-comment
    */
-  renderMember(field: IntrospectionScalarType, parentTypeName: string) {
+  renderMember(field: IntrospectionField, parentTypeName: string) {
     const optional = field.type.kind !== 'NON_NULL'
     const type = this.renderType(field.type, false)
     const resultType = optional ? `${type} | undefined` : type
@@ -182,11 +193,11 @@ ${this.renderMember(field, parentTypeName)}
    * Render a single return type (or field type)
    * This function creates the base type that is then used as generic to a promise
    */
-  renderType(type: IntrospectionTypeRef, optional: boolean) {
+  renderType(type: IntrospectionTypeRef, optional: boolean): string | void {
     function maybeOptional(arg: any) {
       return optional ? `(${arg} | undefined)` : arg
     }
-    function generic(arg): any {
+    function generic(arg: string): any {
       return `${arg}<Ctx>`
     }
 
@@ -221,7 +232,7 @@ ${this.renderMember(field, parentTypeName)}
   /**
    * Render the arguments of a function
    */
-  renderArgumentType(args: Argument[]) {
+  renderArgumentType(args: IntrospectionInputValue[]) {
     const base = args
       .map(arg => {
         return `${arg.name}: ${this.renderType(arg.type, false)}`
@@ -237,8 +248,8 @@ ${this.renderMember(field, parentTypeName)}
     return types
       .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'ENUM')
-      .map(type => this.renderEnum(type))
-      .join('\n')
+      .map((type: IntrospectionEnumType) => this.renderEnum(type))
+      .join(';')
   }
 
   /**
@@ -349,10 +360,10 @@ export interface ${type.name}<Ctx> {
       )
       .map((type: IntrospectionObjectType) => type.fields)
       .reduce((memo, fields) => memo.concat(fields), [])
-      .map(type => renderInputsInterfaces(type, types))
+      .map(type => renderInputsInterfaces(type))
       .join('')
 
-    function renderInputsInterfaces(type, all) {
+    function renderInputsInterfaces(type: IntrospectionField) {
       return `
 export interface ${type.name}Args {
 ${type.args.map(renderArg).join('\n')}
@@ -360,10 +371,41 @@ ${type.args.map(renderArg).join('\n')}
 `
     }
 
-    function renderArg(arg: IntrospectionType) {
+    function isNonNull(
+      x: IntrospectionTypeRef
+    ): x is IntrospectionNonNullTypeRef {
+      return x.kind === 'NON_NULL'
+    }
+
+    function isList(x: IntrospectionTypeRef): x is IntrospectionListTypeRef {
+      return x.kind === 'LIST'
+    }
+
+    function isNamed(x: IntrospectionTypeRef): x is IntrospectionNamedTypeRef {
+      return {}.hasOwnProperty.call(x, 'name')
+    }
+
+    function getTypeRefName(typeRef: IntrospectionTypeRef) {
+      if (isNonNull(typeRef) || isList(typeRef)) {
+        if (
+          typeRef.ofType &&
+          isNamed(typeRef.ofType) &&
+          scalars.hasOwnProperty(typeRef.ofType.name)
+        ) {
+          return scalars[typeRef.ofType.name]
+        }
+      }
+
+      if (isNamed(typeRef) && scalars.hasOwnProperty(typeRef.name)) {
+        return scalars[typeRef.name]
+      }
+
+      return 'any'
+    }
+
+    function renderArg(arg: IntrospectionInputValue) {
       const optional = arg.type.kind === 'NON_NULL' ? '' : '?'
-      const type = arg.type.ofType ? arg.type.ofType.name : arg.type.name
-      return `    ${arg.name}${optional}: ${type}`
+      return `    ${arg.name}${optional}: ${getTypeRefName(arg.type)}`
     }
   }
 
@@ -374,7 +416,7 @@ ${type.args.map(renderArg).join('\n')}
     return types
       .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'INPUT_OBJECT')
-      .map(type => this.renderInputObject(type))
+      .map((type: IntrospectionInputObjectType) => this.renderInputObject(type))
       .join('\n')
   }
 
@@ -420,7 +462,9 @@ ${this.renderInputMember(field)}
     const resolvers = types
       .filter(type => !this.introspectionTypes.has(type.name))
       .filter(type => type.kind === 'UNION' || type.kind === 'INTERFACE')
-      .map(type => this.renderResolver(type))
+      .map((type: IntrospectionUnionType | IntrospectionInterfaceType) =>
+        this.renderResolver(type)
+      )
       .join(',\n')
     return source`\n
 export const defaultResolvers = {
@@ -439,12 +483,4 @@ ${resolvers}
         }
     }`
   }
-}
-
-const scalars = {
-  String: 'string',
-  Int: 'number',
-  Float: 'number',
-  Boolean: 'boolean',
-  ID: 'string',
 }
