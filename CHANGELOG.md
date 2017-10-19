@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Support custom names for root Query, Mutation and Subscription types
+### Changed
+- Using @types/graphql package instead of custom typed definitions
 
 ## [0.0.3] - 2017-10-19
 ### Fixed
