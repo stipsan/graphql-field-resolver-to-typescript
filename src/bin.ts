@@ -2,11 +2,14 @@
 
 import { runCli } from './runCli'
 import * as meow from 'meow'
+import * as fs from 'fs'
+import { promisify } from 'util'
+import * as getStdin from 'get-stdin'
 
 const cli = meow(
   [
     'Usage:',
-    '  $ gqlfr2ts [<input> ...]',
+    '  $ gqlfr2ts <input>',
     '',
     'Options:',
     '  --output, -o path  Specifies the name and location of the output file. If not specified, stdout is used.',
@@ -28,25 +31,37 @@ const cli = meow(
   }
 )
 
+const readFileAsync = promisify(fs.readFile)
+const writeFileAsync = promisify(fs.writeFile)
+
 // most amazing trick ever, since node don't allow `await` on the top level 😜
 const run = async () => {
-  if (cli.input.length === 0 && !cli.flags.stdin) {
-    // check if it is needed to show an error
-    process.stderr.write('\nNo input specified.\n')
+  let schema: string
+  if (cli.input.length > 0) {
+    const schemas = await Promise.all(
+      cli.input.map(async file => {
+        const buffer = await readFileAsync(file)
+        return buffer.toString()
+      })
+    )
+    schema = schemas.join('\n\n')
+  } else {
+    schema = await getStdin()
+  }
+
+  if (!schema.trim()) {
     cli.showHelp()
   }
 
-  // if input is specified use that and ignore stdin
-
-  // use stdin
-
-  // if neither, show error
-
   // proceed with script using input
+  // @TODO temp
+  const output = schema
 
-  // if no -output is specified, output with console.log
-
-  // if output is set, write to file
+  if (cli.flags.output) {
+    return await writeFileAsync(cli.flags.output, output)
+  } else {
+    console.log(output)
+  }
 }
 
 // fire away!

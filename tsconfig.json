@@ -10,7 +10,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "pretty": true,
-    "lib": ["es6", "es2017"],
     "rootDir": "./src",
     "outDir": "./dist"
   },
