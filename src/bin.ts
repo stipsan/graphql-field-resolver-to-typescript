@@ -33,11 +33,21 @@ const cli = meow(
   }
 )
 
-runCli({
-  input: stringArray(program['input'], "Verification of 'input'-parameter"),
-  exclude: stringArray(
-    program['exclude'],
-    "Verification of 'exclude'-parameter"
-  ),
-  dontSaveSameFile: Boolean(program['dontSaveSameFile']),
-}).then(() => console.log('done'))
+// wrap in async function for simplicity
+if (cli.input.length === 0 && !cli.flags.stdin) {
+  // check if it is needed to show an error
+  process.stderr.write('\nNo input specified.\n')
+  cli.showHelp()
+}
+
+// if input is specified use that and ignore stdin
+
+// use stdin
+
+// if neither, show error
+
+// proceed with script using input
+
+// if no -output is specified, output with console.log
+
+// if output is set, write to file

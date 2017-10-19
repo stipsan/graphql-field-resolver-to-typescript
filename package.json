@@ -17,12 +17,14 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "dependencies": {
+    "get-stdin": "^5.0.1",
     "graphql": "^0.10.5",
     "graphql-subscriptions": "^0.4.4",
     "graphql-tools": "^1.1.0",
     "meow": "^3.7.0"
   },
   "devDependencies": {
+    "@types/get-stdin": "^5.0.1",
     "@types/graphql": "^0.11.5",
     "@types/meow": "^3.6.2",
     "@types/node": "^8.0.45",
